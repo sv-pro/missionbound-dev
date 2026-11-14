@@ -57,7 +57,7 @@ mission approve         # you, after reading the design (human gate)
 ## Layers
 
 This is the mission layer: which work may happen in which phase, and what "done" means.
-Underneath, [ai2rules](https://github.com/sv-pro/ai2rules) is the execution layer that can
+Underneath, [ai2rules](https://ai2rules.dev/kernel/) is the execution layer that can
 make the agent's actions absent rather than refused.
 
 ## Develop
