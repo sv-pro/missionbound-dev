@@ -1,0 +1,49 @@
+# Mission for lead-scout: the first real run of missionbound-dev.
+# The requirements are the "Rules" of the lead-scout prompt, each turned into a check.
+# The human writes tests/acceptance/ (with recorded GitHub API fixtures) BEFORE the agent starts.
+title: lead-scout
+goal:
+  - id: REQ-READONLY
+    description: only GitHub's public API is called, and only with GET
+    check: "pytest -q tests/acceptance/test_readonly.py"
+  - id: REQ-NO-SECRETS
+    description: a secret-looking literal is reported as path:line, its value never appears in any output
+    check: "pytest -q tests/acceptance/test_no_secret_values.py"
+  - id: REQ-ORG-LEVEL
+    description: output rows are organisations; no personal emails or people are collected
+    check: "pytest -q tests/acceptance/test_org_level.py"
+  - id: REQ-RATE-LIMIT
+    description: backs off on 403/429 and on the code-search per-minute limit
+    check: "pytest -q tests/acceptance/test_rate_limit.py"
+  - id: REQ-TRUNCATION
+    description: hitting the 1000-results cap is reported, never silent
+    check: "pytest -q tests/acceptance/test_truncation_reported.py"
+  - id: REQ-LLM-ADDS-ONLY
+    description: with --llm, rows are the same set in the same order; the LLM only adds columns
+    check: "pytest -q tests/acceptance/test_llm_adds_only.py"
+  - id: REQ-OFFLINE-TESTS
+    description: the whole test suite runs with no network (needs pytest-socket in dev deps)
+    check: "pytest -q --disable-socket"
+protected:
+  - tests/acceptance/**
+  - tests/fixtures/github/**
+initial_phase: design
+phases:
+  design:
+    writes: ["docs/**"]
+    next: implement
+    gate: human
+  implement:
+    writes: ["src/**", "tests/unit/**", "docs/**", "README.md", "pyproject.toml"]
+    next: verify
+    gate: checks
+    stop_requires_checks: true
+  verify:
+    writes: ["docs/**", "README.md", "REPORT.md"]
+    next: done
+    gate: human
+    stop_requires_checks: true
+forbidden_bash: ["git push --force", "git reset --hard", "--no-verify", "curl ", "wget "]
+limits:
+  stop_blocks: 5
+  check_timeout_s: 600
