@@ -17,3 +17,8 @@ mission = "missionbound_dev.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+# examples/lead-scout/tests-drafts/ are black-box acceptance tests for a lead-scout
+# program that does not exist yet; run them by path once it does.
+testpaths = ["tests"]
